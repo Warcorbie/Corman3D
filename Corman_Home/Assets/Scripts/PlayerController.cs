@@ -6,14 +6,16 @@ public class PlayerController : MonoBehaviour {
 
     public float speed;
     public float jumpForce;
+    public GameObject objCheck;
 
     float moveX;
     Rigidbody p_rigidbody;
-    Vector3 movement;
+    Vector3 movement, jumping;
 
     bool grounded;
-    Transform groundCheck;
     bool isJumping;
+    
+    
 
 	void Start () {
         p_rigidbody = GetComponent<Rigidbody>();
@@ -22,12 +24,15 @@ public class PlayerController : MonoBehaviour {
 	
 	// FixedUpdate weil Physik im Spiel ist
 	void FixedUpdate () {
-        //grounded = Physics.Linecast(transform.position, groundCheck.position, 1 << LayerMask.GetMask("Ground"));
-        //if (grounded == true)
-        //    Debug.Log("isGrounded");
 
-        moveX = Input.GetAxis("Horizontal") * speed;
+        //OnCollisionEnter();
+   
+        moveX = Input.GetAxis("Horizontal");
         Move(moveX);
+
+
+        if (Input.GetButtonDown("Jump"))
+            Jump(jumpForce);
 	}
 
 
@@ -38,8 +43,36 @@ public class PlayerController : MonoBehaviour {
         p_rigidbody.MovePosition(transform.position + movement);
     }
 
-    void Jump()
+    void Jump(float y)
     {
+        if (grounded == true )
+        { 
+            jumping.Set(0.0f, y, 0.0f);
+            jumping = jumping * jumpForce * Time.deltaTime;
+            p_rigidbody.AddForce(transform.position + jumping);
+            //isJumping = false;
+        }
+        //else
+        //{
+        //    isJumping = true;
+        //}
 
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+      if(collision.gameObject.tag == "Ground")
+        {
+            grounded = true;
+            Debug.Log("Grounded True");
+        }
+    }
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Ground")
+        {
+            grounded = false;
+            Debug.Log("Grounded false");
+        }
     }
 }
