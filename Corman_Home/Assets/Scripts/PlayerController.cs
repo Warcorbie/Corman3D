@@ -6,27 +6,24 @@ public class PlayerController : MonoBehaviour {
 
     public float speed;
     public float jumpForce;
-    public GameObject objCheck;
 
     float moveX;
     Rigidbody p_rigidbody;
     Vector3 movement, jumping;
 
-    bool grounded;
-    bool isJumping;
+    List<int> ground;
     
     
 
-	void Start () {
+	void Start ()
+    {
         p_rigidbody = GetComponent<Rigidbody>();
-        
+        ground = new List<int>();        
 	}
 	
 	// FixedUpdate weil Physik im Spiel ist
-	void FixedUpdate () {
-
-        //OnCollisionEnter();
-   
+	void FixedUpdate ()
+    {
         moveX = Input.GetAxis("Horizontal");
         Move(moveX);
 
@@ -45,34 +42,34 @@ public class PlayerController : MonoBehaviour {
 
     void Jump(float y)
     {
-        if (grounded == true )
+        if (ground.Count >= 1)
         { 
             jumping.Set(0.0f, y, 0.0f);
             jumping = jumping * jumpForce * Time.deltaTime;
             p_rigidbody.AddForce(transform.position + jumping);
-            //isJumping = false;
+           
         }
-        //else
-        //{
-        //    isJumping = true;
-        //}
-
     }
 
     void OnCollisionEnter(Collision collision)
     {
-      if(collision.gameObject.tag == "Ground")
-        {
-            grounded = true;
-            Debug.Log("Grounded True");
+        if (collision.gameObject.tag == "Ground")
+        {          
+                ground.Add(1);
+                Debug.Log("Jump");            
         }
     }
+
     void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.tag == "Ground")
         {
-            grounded = false;
-            Debug.Log("Grounded false");
+
+                ground.Remove(1);
+                Debug.Log("notJump");
+
         }
     }
+
+
 }
