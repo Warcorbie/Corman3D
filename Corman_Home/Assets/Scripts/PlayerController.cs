@@ -7,9 +7,13 @@ public class PlayerController : MonoBehaviour {
     public float speed;
     public float jumpForce;
 
+
+    float kneelFaktor;
     float moveX;
     Rigidbody p_rigidbody;
     Vector3 movement, jumping;
+    CapsuleCollider col;
+    
 
     List<int> ground;
     
@@ -18,26 +22,52 @@ public class PlayerController : MonoBehaviour {
 	void Start ()
     {
         p_rigidbody = GetComponent<Rigidbody>();
-        ground = new List<int>();        
+        ground = new List<int>();
+        col = GetComponent<CapsuleCollider>();
+        kneelFaktor = 2f;
 	}
 	
 	// FixedUpdate weil Physik im Spiel ist
 	void FixedUpdate ()
     {
         moveX = Input.GetAxis("Horizontal");
-        Move(moveX);
+        Move();
 
 
         if (Input.GetButtonDown("Jump"))
             Jump(jumpForce);
+
+        if (ground.Count >= 1)
+        {
+            if (Input.GetButtonDown("Kneel"))
+            {                
+                    KneelDown();
+            }
+        }
+        if (Input.GetButtonUp("Kneel"))
+        {         
+            KneelUp();
+        }
 	}
 
-
-    void Move(float x)
+    void KneelDown()
     {
-        movement.Set(x, 0.0f, 0.0f);
-        movement = movement * speed * Time.deltaTime;
-        p_rigidbody.MovePosition(transform.position + movement);
+        if (col.height >= 1 && col.height <= 2)
+            col.height = col.height / kneelFaktor;
+
+        Debug.Log(col.height);
+    }
+    void KneelUp()
+    {
+        if (col.height >= 1 && col.height <= 2)
+            col.height = col.height * kneelFaktor;
+        Debug.Log(col.height);
+    }
+
+    void Move()
+    {
+        movement = new Vector3(moveX * speed * Time.deltaTime, 0.0f, 0.0f);
+        p_rigidbody.MovePosition(p_rigidbody.position + movement);
     }
 
     void Jump(float y)
@@ -47,7 +77,7 @@ public class PlayerController : MonoBehaviour {
             jumping.Set(0.0f, y, 0.0f);
             jumping = jumping * jumpForce * Time.deltaTime;
             p_rigidbody.AddForce(transform.position + jumping);
-           
+            ground.Clear();
         }
     }
 
@@ -56,7 +86,7 @@ public class PlayerController : MonoBehaviour {
         if (collision.gameObject.tag == "Ground")
         {          
                 ground.Add(1);
-                Debug.Log("Jump");            
+            Debug.Log(col.height);
         }
     }
 
@@ -66,7 +96,7 @@ public class PlayerController : MonoBehaviour {
         {
 
                 ground.Remove(1);
-                Debug.Log("notJump");
+                
 
         }
     }
