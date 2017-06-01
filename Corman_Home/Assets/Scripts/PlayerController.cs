@@ -6,16 +6,19 @@ public class PlayerController : MonoBehaviour {
 
     public float speed;
     public float jumpForce;
+    public float slideForce;
 
 
-    float kneelFaktor;
     float moveX;
     Rigidbody p_rigidbody;
-    Vector3 movement, jumping;
+    Vector3 movement, jumping, slideing;
     CapsuleCollider col;
+    SphereCollider kneelcol;
     
 
     List<int> ground;
+    List<int> onKneel;
+    bool isKneel = false;
     
     
 
@@ -23,62 +26,74 @@ public class PlayerController : MonoBehaviour {
     {
         p_rigidbody = GetComponent<Rigidbody>();
         ground = new List<int>();
+        onKneel = new List<int>();
         col = GetComponent<CapsuleCollider>();
-        kneelFaktor = 2f;
+        kneelcol = GetComponent<SphereCollider>();
 	}
 	
 	// FixedUpdate weil Physik im Spiel ist
 	void FixedUpdate ()
     {
         moveX = Input.GetAxis("Horizontal");
-        Move();
-
-
-        if (Input.GetButtonDown("Jump"))
-            Jump(jumpForce);
+        if(onKneel.Count == 0)
+            Move(moveX);
 
         if (ground.Count >= 1)
         {
-            if (Input.GetButtonDown("Kneel"))
+            if (Input.GetButtonDown("Jump") && onKneel.Count == 0)
+                Jump(jumpForce);
+
+            if (Input.GetAxisRaw("Kneel") == 1 && isKneel == false)
             {                
-                    KneelDown();
+              Kneel();
+              isKneel = true;
+              onKneel.Add(1);
+            }
+
+            if (Input.GetButtonDown("Jump") && onKneel.Count >= 1)
+            {
+                Slide(slideForce);
             }
         }
-        if (Input.GetButtonUp("Kneel"))
-        {         
-            KneelUp();
+        if (Input.GetAxisRaw("Kneel") == 0 && isKneel == true)
+        {
+            Kneel();
+            isKneel = false;
+            onKneel.Clear();
         }
+  
 	}
 
-    void KneelDown()
+    void Kneel()
     {
-        if (col.height >= 1 && col.height <= 2)
-            col.height = col.height / kneelFaktor;
 
-        Debug.Log(col.height);
-    }
-    void KneelUp()
-    {
-        if (col.height >= 1 && col.height <= 2)
-            col.height = col.height * kneelFaktor;
-        Debug.Log(col.height);
+        col.enabled = !col.enabled;
+        kneelcol.enabled = !kneelcol.enabled;
+     
+        Debug.Log(col.enabled);
+        Debug.Log(kneelcol.enabled);
     }
 
-    void Move()
+    void Slide(float x)
     {
-        movement = new Vector3(moveX * speed * Time.deltaTime, 0.0f, 0.0f);
+        slideing.Set(x, 0.0f, 0.0f);
+        slideing = slideing * slideForce * Time.deltaTime;
+        p_rigidbody.AddForce(slideing);
+    }
+
+    void Move(float x)
+    {
+        movement.Set(x, 0.0f, 0.0f);
+        movement = movement.normalized * speed * Time.deltaTime;
         p_rigidbody.MovePosition(p_rigidbody.position + movement);
     }
 
     void Jump(float y)
     {
-        if (ground.Count >= 1)
-        { 
             jumping.Set(0.0f, y, 0.0f);
             jumping = jumping * jumpForce * Time.deltaTime;
-            p_rigidbody.AddForce(transform.position + jumping);
+            p_rigidbody.AddForce(jumping);
             ground.Clear();
-        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -86,7 +101,7 @@ public class PlayerController : MonoBehaviour {
         if (collision.gameObject.tag == "Ground")
         {          
                 ground.Add(1);
-            Debug.Log(col.height);
+            
         }
     }
 
