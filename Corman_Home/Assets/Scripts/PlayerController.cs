@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
 
     float moveX;
     Rigidbody p_rigidbody;
-    Vector3 movement, jumping, slideing;
+    Vector3 movement, jumping, slideing, velocity, lastPosition;
     CapsuleCollider col;
     SphereCollider kneelcol;
     
@@ -29,19 +29,28 @@ public class PlayerController : MonoBehaviour {
         onKneel = new List<int>();
         col = GetComponent<CapsuleCollider>();
         kneelcol = GetComponent<SphereCollider>();
+        
 	}
-	
+	void Update()
+    {
+        velocity.x = ((p_rigidbody.position - lastPosition).magnitude / Time.deltaTime);
+        lastPosition = p_rigidbody.position;
+    }
 	// FixedUpdate weil Physik im Spiel ist
 	void FixedUpdate ()
     {
         moveX = Input.GetAxis("Horizontal");
-        if(onKneel.Count == 0)
-            Move(moveX);
+        if (onKneel.Count == 0)
+        {
+            Move(moveX, velocity.x);
+            Debug.Log(velocity.x);
+        }
+
 
         if (ground.Count >= 1)
         {
             if (Input.GetButtonDown("Jump") && onKneel.Count == 0)
-                Jump(jumpForce);
+                Jump(jumpForce, velocity.x);
 
             if (Input.GetAxisRaw("Kneel") == 1 && isKneel == false)
             {                
@@ -69,9 +78,6 @@ public class PlayerController : MonoBehaviour {
 
         col.enabled = !col.enabled;
         kneelcol.enabled = !kneelcol.enabled;
-     
-        Debug.Log(col.enabled);
-        Debug.Log(kneelcol.enabled);
     }
 
     void Slide(float x)
@@ -81,14 +87,14 @@ public class PlayerController : MonoBehaviour {
         p_rigidbody.AddForce(slideing);
     }
 
-    void Move(float x)
+    void Move(float x, float xX)
     {
         movement.Set(x, 0.0f, 0.0f);
         movement = movement.normalized * speed * Time.deltaTime;
         p_rigidbody.MovePosition(p_rigidbody.position + movement);
     }
 
-    void Jump(float y)
+    void Jump(float y, float x)
     {
             jumping.Set(0.0f, y, 0.0f);
             jumping = jumping * jumpForce * Time.deltaTime;
