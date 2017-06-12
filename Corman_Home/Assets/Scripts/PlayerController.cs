@@ -42,13 +42,13 @@ public class PlayerController : MonoBehaviour {
     {
         moveX = Input.GetAxis("Horizontal");
         if (onKneel.Count == 0)
-<<<<<<< HEAD
+
         {
-            Move(moveX, velocity.x);
-            Debug.Log(velocity.x);
+            Move(moveX);
+            Debug.Log(velocity);
         }
 
-=======
+
         {                             //Nur Bewegbar wenn er nicht im knien ist
             Move(moveX);         
         }
@@ -57,14 +57,14 @@ public class PlayerController : MonoBehaviour {
         {
             Flip(moveX);
         }
->>>>>>> 43cf57b636f090e36ebbb7063b6c3c2d08c7e2cb
+
 
      
 
         if (ground.Count >= 1)                              //Jeglicher Input der auf den Boden stattfindet
         {
             if (Input.GetButtonDown("Jump") && onKneel.Count == 0)
-                Jump(jumpForce, velocity.x);
+                Jump(jumpForce);
 
             if (Input.GetAxisRaw("Kneel") == 1 && isKneel == false)
             {                
@@ -102,22 +102,18 @@ public class PlayerController : MonoBehaviour {
         p_rigidbody.AddForce(slideing);
     }
 
-<<<<<<< HEAD
-    void Move(float x, float xX)
-=======
+
+
     void Move(float x)          // Movement function
->>>>>>> 43cf57b636f090e36ebbb7063b6c3c2d08c7e2cb
     {
         movement.Set(x, 0.0f, 0.0f);
-        movement = movement.normalized * speed * Time.deltaTime;
+        movement = movement * speed * Time.deltaTime;
         p_rigidbody.MovePosition(p_rigidbody.position + movement);
     }
 
-<<<<<<< HEAD
-    void Jump(float y, float x)
-=======
+
+
     void Jump(float y)          // Jump function
->>>>>>> 43cf57b636f090e36ebbb7063b6c3c2d08c7e2cb
     {
             jumping.Set(0.0f, y, 0.0f);
             jumping = jumping * jumpForce * Time.deltaTime;
