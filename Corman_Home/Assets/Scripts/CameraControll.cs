@@ -5,11 +5,9 @@ using UnityEngine;
 public class CameraControll : MonoBehaviour {
 
     public Transform target;
-    public float smoothing = 5f;
+    public float smoothing;
 
     Vector3 offset;
-
-
 
 	void Start () {
         offset = transform.position - target.transform.position;

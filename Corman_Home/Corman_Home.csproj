@@ -78,7 +78,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\BulletMover.cs" />
     <Compile Include="Assets\Scripts\CameraControll.cs" />
+    <Compile Include="Assets\Scripts\DestroyByBoundary.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

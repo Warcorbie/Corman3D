@@ -7,10 +7,14 @@ public class PlayerController : MonoBehaviour {
     public float speed;
     public float jumpForce;
     public float slideForce;
+    public Transform bulletErmitter;
+    public GameObject bullet;
+    public float fireRate;
     
 
 
     float moveX;
+    float nextFire;
     Rigidbody p_rigidbody;
     Vector3 movement, jumping, slideing, velocity, lastPosition;
     CapsuleCollider col;
@@ -36,6 +40,12 @@ public class PlayerController : MonoBehaviour {
     {
         velocity.x = ((p_rigidbody.position - lastPosition).magnitude / Time.deltaTime);
         lastPosition = p_rigidbody.position;
+
+        if (Input.GetButtonDown("Shoot") && Time.time > nextFire)
+        {
+            nextFire = Time.time + fireRate;
+            Shooting();
+        }
     }
 	// FixedUpdate weil Physik im Spiel ist
 	void FixedUpdate ()
@@ -58,9 +68,6 @@ public class PlayerController : MonoBehaviour {
             Flip(moveX);
         }
 
-
-     
-
         if (ground.Count >= 1)                              //Jeglicher Input der auf den Boden stattfindet
         {
             if (Input.GetButtonDown("Jump") && onKneel.Count == 0)
@@ -78,6 +85,8 @@ public class PlayerController : MonoBehaviour {
                 Slide(slideForce);
             }
         }
+
+
 
         if (Input.GetAxisRaw("Kneel") == 0 && isKneel == true)  //Knie Input
         {
@@ -102,7 +111,10 @@ public class PlayerController : MonoBehaviour {
         p_rigidbody.AddForce(slideing);
     }
 
-
+    void Shooting()
+    {
+        Instantiate(bullet, bulletErmitter.position, bulletErmitter.rotation);
+    }
 
     void Move(float x)          // Movement function
     {
